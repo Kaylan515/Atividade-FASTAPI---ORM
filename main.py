@@ -26,15 +26,27 @@ def home(request: Request):
     )
 
 #Para exibir um html na rota - exibir o formulário
-@app.get("/produtos/cadastro", response_class=HTMLResponse)
-def exibir_produto(request: Request):
-    return templates.TemplateResponse(request, "cadastro_produto.html", {"request": request})
+@app.get("/produtos/cadastro")
+def exibir_produto(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    categorias = db.query(Categoria).all()
+
+    return templates.TemplateResponse(
+        request,
+        "cadastro_produto.html",
+        {
+            "request": request,
+            "categorias": categorias
+        }
+    )
 
 #Rota para cadastrar um produto
 @app.post("/produtos")
 def cadastrar_produto(
     nome: str = Form(...),
-    preco: float = Form(...), 
+    preco: int = Form(...),
     estoque: int = Form(...),
     categoria_id: int = Form(...),
     db: Session = Depends(get_db)
@@ -49,7 +61,7 @@ def cadastrar_produto(
     db.add(novo_produto)
     db.commit()
 
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/listar_produtos", status_code=303)
 
 #Listar produtos
 @app.get("/listar_produtos")
