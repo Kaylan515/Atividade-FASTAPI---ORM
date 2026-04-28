@@ -75,3 +75,12 @@ def deletar_produto(
         db.delete(produto)
         db.commit()
     return RedirectResponse(url="/listar_produtos", status_code=303)
+
+#Area de categorias
+@app.get("/categorias/cadastro", response_class=HTMLResponse)
+def formulario_categoria(request: Request):
+    return templates.TemplateResponse(
+        request,
+        "cadastro_categoria.html",
+        {"request": request}
+    )
