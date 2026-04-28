@@ -28,3 +28,32 @@ def home(request: Request):
 @app.get("/produtos/cadastro", response_class=HTMLResponse)
 def exibir_produto(request: Request):
     return templates.TemplateResponse(request, "cadastro_produto.html", {"request": request})
+
+#Rota para cadastrar um produto
+@app.post("/produtos")
+def cadastrar_produto(
+    nome: str = Form(...),
+    preco: float = Form(...), 
+    estoque: int = Form(...),
+    categoria_id: int = Form(...),
+    db: Session = Depends(get_db)
+):
+    novo_produto = Produto(
+        nome=nome,
+        preco=preco,
+        estoque=estoque,
+        categoria_id=categoria_id
+    )
+
+    db.add(novo_produto)
+    db.commit()
+
+    return RedirectResponse(url="/", status_code=303)
+
+@app.get("/produtos/novo")
+def formulario_produto(request: Request, db: Session = Depends(get_db)):
+    categorias = db.query(Categoria).all()
+    return templates.TemplateResponse("cadastro_produto.html", {
+        "request": request,
+        "categorias": categorias
+    })
