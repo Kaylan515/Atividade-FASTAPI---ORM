@@ -14,6 +14,8 @@ app = FastAPI(title="Gerenciamento de Produtos")
 # configurar templates
 templates = Jinja2Templates(directory="templates")
 
+# Rota inicial
+#Rota inicial para apresentação
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse(
@@ -21,3 +23,8 @@ def home(request: Request):
         "index.html",
         {"request": request}
     )
+
+#Para exibir um html na rota - exibir o formulário
+@app.get("/produtos/cadastro", response_class=HTMLResponse)
+def exibir_produto(request: Request):
+    return templates.TemplateResponse(request, "cadastro_produto.html", {"request": request})
