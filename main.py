@@ -84,3 +84,48 @@ def formulario_categoria(request: Request):
         "cadastro_categoria.html",
         {"request": request}
     )
+
+#Rota para cadastrar categoria
+@app.post("/categorias")
+def cadastrar_categoria(
+    nome: str = Form(...),
+    descricao: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    nova_categoria = Categoria(
+        nome=nome,
+        descricao=descricao
+    )
+
+    db.add(nova_categoria)
+    db.commit()
+
+    return RedirectResponse(url="/listar_categorias", status_code=303)
+
+#Rota para listar categorias
+@app.get("/listar_categorias")
+def listar_categorias(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    categorias = db.query(Categoria).all()
+
+    return templates.TemplateResponse(
+        request,
+        "categorias.html",
+        {"request": request, "categorias": categorias}
+    )
+
+#Rota para deletar categoria
+@app.post("/categorias/{id}/deletar")
+def deletar_categoria(
+    id: int,
+    db: Session = Depends(get_db)
+):
+    categoria = db.query(Categoria).get(id)
+
+    if categoria:
+        db.delete(categoria)
+        db.commit()
+
+    return RedirectResponse(url="/listar_categorias", status_code=303)
